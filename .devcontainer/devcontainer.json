@@ -1,7 +1,6 @@
 {
     "hostRequirements": {
-        "cpus": 16,
-        "memory": "32gb",
-        "storage": "64gb"
+        "cpus": 8,
+        "memory": "16gb"
     }
 }

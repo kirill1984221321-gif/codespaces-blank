@@ -1,0 +1,42 @@
+services:
+  windows:
+    image: dockurr/windows
+    container_name: windows
+    environment:
+      VERSION: "7u"                # Windows 7 Ultimate
+      DISK_SIZE: "128G"            # Динамический диск 128 ГБ (растет по мере скачивания)
+      DISK2_SIZE: "4G"             # Диск D:
+      RAM_SIZE: "4G"               # Оптимальный объем ОЗУ для хоста
+      CPU_CORES: "2"               # 2 ядра процессора
+      LANGUAGE: "Russian"          # Русская установка
+      VNC: "Y"                     # Включаем VNC (порт 5900)
+      AUDIO: "Y"                   # Включение звука Intel HDA
+      USERNAME: "kirill"           # Твой юзер
+      PASSWORD: "20151984"         # Твой пароль
+      ALLOCATE: "N"                # Разреженный файл диска (экономия места)
+      SAVESETTINGS: "Y"            # Фиксация кэша
+      NET_MODE: "bridge"           # Быстрый сетевой мост
+      BALLOON: "Y"                 # Динамический возврат памяти
+      # ДОПИСАНО ДО КОНЦА: Полный набор Hyper-V Enlightenments (hv_time + hv_stimer исправлены!)
+      CPU_MODEL: "host"
+      CPU_FLAGS: "kvm=on,hv_relaxed,hv_vapic,hv_spinlocks=0x1fff,hv_stimer,hv_time"
+      # ИСПРАВЛЕНО: Убран конфликтный -accel, выставлен опрос мыши 1000 Гц и hpet.msi=off под QEMU v10
+      ARGUMENTS: "-device usb-tablet -global usb-tablet.msouserate=1000 -audiodev id=snd,driver=none -device ich9-intel-hda -device hda-duplex,audiodev=snd -vga std -rtc base=localtime,clock=host -global kvm-pit.lost_tick_policy=discard -global hpet.msi=off"
+    devices:
+      - /dev/kvm                   # Аппаратное ускорение KVM хоста
+      - /dev/net/tun               # Сетевой туннель
+    cap_add:
+      - NET_ADMIN                  # Права сети
+    ports:
+      - 8006:8006                  # noVNC (Браузер)
+      - 3389:3389/tcp              # Microsoft RDP
+      - 3389:3389/udp              # RDP быстрый поток
+      - 5900:5900/tcp              # VNC порт
+    volumes:
+      - /workspaces/codespaces-blank/windows_disk_c:/storage
+      - /workspaces/codespaces-blank/windows_disk_d:/storage2
+      - /workspaces/codespaces-blank/shared_files:/shared
+      # Аварийная папка переполнения (сработает только если в /workspaces кончится физическое место)
+      - /tmp:/tmp_overflow
+    restart: always
+    stop_grace_period: 2m

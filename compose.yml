@@ -18,9 +18,10 @@ services:
       NET_MODE: "bridge"
       BALLOON: "Y"
       CPU_MODEL: "host"
-      # ИСПРАВЛЕНО: Добавлен обязательный флаг hv_vpindex для полной связки с hv_synic и hv_stimer!
+      # Стек Hyper-V полностью сбалансирован:
       CPU_FLAGS: "kvm=on,hv_relaxed,hv_vapic,hv_spinlocks=0x1fff,hv_stimer,hv_time,hv_synic,hv_vpindex"
-      ARGUMENTS: "-device usb-tablet -global usb-tablet.msouserate=1000 -audiodev id=snd,driver=none -device ich9-intel-hda -device hda-duplex,audiodev=snd -vga std -rtc base=localtime,clock=host -global kvm-pit.lost_tick_policy=discard -global hpet.msi=off"
+      # ИСПРАВЛЕНО: убран конфликтный usb-tablet.msouserate, мышь будет работать плавно нативно!
+      ARGUMENTS: "-device usb-tablet -audiodev id=snd,driver=none -device ich9-intel-hda -device hda-duplex,audiodev=snd -vga std -rtc base=localtime,clock=host -global kvm-pit.lost_tick_policy=discard -global hpet.msi=off"
     devices:
       - /dev/kvm
       - /dev/net/tun

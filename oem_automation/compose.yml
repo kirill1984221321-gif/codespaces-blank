@@ -1,0 +1,40 @@
+services:
+  windows:
+    image: dockurr/windows
+    container_name: windows
+    environment:
+      VERSION: "7u"
+      DISK_SIZE: "128G"
+      DISK2_SIZE: "4G"
+      RAM_SIZE: "4G"
+      CPU_CORES: "2"
+      LANGUAGE: "Russian"
+      VNC: "Y"
+      AUDIO: "Y"
+      USERNAME: "kirill"
+      PASSWORD: "20151984"
+      ALLOCATE: "N"
+      SAVESETTINGS: "Y"
+      NET_MODE: "bridge"
+      BALLOON: "Y"
+      CPU_MODEL: "host"
+      CPU_FLAGS: "kvm=on,hv_relaxed,hv_vapic,hv_spinlocks=0x1fff,hv_stimer,hv_time,hv_synic,hv_vpindex"
+      # ИСПРАВЛЕНО: убран проблемный -global usb-tablet.msouserate, мышь будет плавной нативно
+      ARGUMENTS: "-device usb-tablet -audiodev id=snd,driver=none -device ich9-intel-hda -device hda-duplex,audiodev=snd -vga std -rtc base=localtime,clock=host -global kvm-pit.lost_tick_policy=discard -global hpet.msi=off"
+    devices:
+      - /dev/kvm
+      - /dev/net/tun
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - 8006:8006
+      - 3389:3389/tcp
+      - 3389:3389/udp
+      - 5900:5900/tcp
+    volumes:
+      - /workspaces/codespaces-blank/windows_disk_c:/storage
+      - /workspaces/codespaces-blank/windows_disk_d:/storage2
+      - /workspaces/codespaces-blank/shared_files:/shared
+      - /tmp:/tmp_overflow
+    restart: always
+    stop_grace_period: 2m

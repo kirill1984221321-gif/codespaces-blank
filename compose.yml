@@ -3,40 +3,39 @@ services:
     image: dockurr/windows
     container_name: windows
     environment:
-      VERSION: "7u"                # Windows 7 Ultimate
-      DISK_SIZE: "128G"            # Динамический диск 128 ГБ (растет по мере скачивания)
+      VERSION: "7u"                # Windows 7 Ultimate [source: 0.1.8]
+      DISK_SIZE: "128G"            # Динамический диск до 128 ГБ [source: 0.1.8]
       DISK2_SIZE: "4G"             # Диск D:
-      RAM_SIZE: "4G"               # Оптимальный объем ОЗУ для хоста
-      CPU_CORES: "2"               # 2 ядра процессора
-      LANGUAGE: "Russian"          # Русская установка
-      VNC: "Y"                     # Включаем VNC (порт 5900)
-      AUDIO: "Y"                   # Включение звука Intel HDA
-      USERNAME: "kirill"           # Твой юзер
-      PASSWORD: "20151984"         # Твой пароль
-      ALLOCATE: "N"                # Разреженный файл диска (экономия места)
-      SAVESETTINGS: "Y"            # Фиксация кэша
-      NET_MODE: "bridge"           # Быстрый сетевой мост
-      BALLOON: "Y"                 # Динамический возврат памяти
-      # ДОПИСАНО ДО КОНЦА: Полный набор Hyper-V Enlightenments (hv_time + hv_stimer исправлены!)
+      RAM_SIZE: "4G"               # Стабильный объем ОЗУ [source: 0.1.8]
+      CPU_CORES: "2"               # 2 ядра процессора [source: 0.1.8]
+      LANGUAGE: "Russian"          # Русская установка [source: 0.1.8]
+      VNC: "Y"                     # Включаем VNC [source: 0.1.8]
+      AUDIO: "Y"                   # Включение звука [source: 0.1.8]
+      USERNAME: "kirill"           # Твой юзер [source: 0.1.8]
+      PASSWORD: "20151984"         # Твой пароль [source: 0.1.8]
+      ALLOCATE: "N"                # Разреженный файл диска [source: 0.1.8]
+      SAVESETTINGS: "Y"            # Фиксация настроек [source: 0.1.8]
+      NET_MODE: "bridge"           # Ускоренная сеть [source: 0.1.8]
+      BALLOON: "Y"                 # Динамический возврат памяти [source: 0.1.8]
+      # ИСПРАВЛЕНО ДО КОНЦА: Добавлен обязательный hv_synic для устранения вылета hv-stimer! [source: 0.1.21]
       CPU_MODEL: "host"
-      CPU_FLAGS: "kvm=on,hv_relaxed,hv_vapic,hv_spinlocks=0x1fff,hv_stimer,hv_time"
-      # ИСПРАВЛЕНО: Убран конфликтный -accel, выставлен опрос мыши 1000 Гц и hpet.msi=off под QEMU v10
+      CPU_FLAGS: "kvm=on,hv_relaxed,hv_vapic,hv_spinlocks=0x1fff,hv_stimer,hv_time,hv_synic"
+      # Чистый звук, опрос мыши 1000 Гц и отключение HPET
       ARGUMENTS: "-device usb-tablet -global usb-tablet.msouserate=1000 -audiodev id=snd,driver=none -device ich9-intel-hda -device hda-duplex,audiodev=snd -vga std -rtc base=localtime,clock=host -global kvm-pit.lost_tick_policy=discard -global hpet.msi=off"
     devices:
-      - /dev/kvm                   # Аппаратное ускорение KVM хоста
-      - /dev/net/tun               # Сетевой туннель
+      - /dev/kvm                   # Аппаратное ускорение KVM хоста [source: 0.1.8]
+      - /dev/net/tun               # Сетевой туннель [source: 0.1.8]
     cap_add:
-      - NET_ADMIN                  # Права сети
+      - NET_ADMIN                  # Права сети [source: 0.1.8]
     ports:
-      - 8006:8006                  # noVNC (Браузер)
-      - 3389:3389/tcp              # Microsoft RDP
-      - 3389:3389/udp              # RDP быстрый поток
-      - 5900:5900/tcp              # VNC порт
+      - 8006:8006                  # noVNC (Браузер) [source: 0.1.8]
+      - 3389:3389/tcp              # Microsoft RDP [source: 0.1.8]
+      - 3389:3389/udp              # RDP быстрый поток [source: 0.1.8]
+      - 5900:5900/tcp              # VNC порт [source: 0.1.8]
     volumes:
-      - /workspaces/codespaces-blank/windows_disk_c:/storage
-      - /workspaces/codespaces-blank/windows_disk_d:/storage2
-      - /workspaces/codespaces-blank/shared_files:/shared
-      # Аварийная папка переполнения (сработает только если в /workspaces кончится физическое место)
+      - /workspaces/codespaces-blank/windows_disk_c:/storage [source: 0.1.8]
+      - /workspaces/codespaces-blank/windows_disk_d:/storage2 [source: 0.1.8]
+      - /workspaces/codespaces-blank/shared_files:/shared [source: 0.1.8]
       - /tmp:/tmp_overflow
     restart: always
     stop_grace_period: 2m

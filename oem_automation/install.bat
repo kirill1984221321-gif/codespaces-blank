@@ -58,10 +58,7 @@ echo   ^<button class="btn" onclick="RunOptimization"^>ЗАПУСТИТЬ ОПТ
 echo ^</body^>^</html^>
 ) > "%HTA_FILE%"
 
-:: Запускаем графический интерфейс и ждем выбора пользователя
 mshta "%HTA_FILE%"
-
-:: Считываем настройки из временного конфигуратора
 for /f "tokens=1,2 delims==" %%a in (%temp%\config.txt) do set "%%a=%%b"
 
 echo.
@@ -90,7 +87,6 @@ if "%INDEX%"=="1" (
     echo [OEM] Уничтожение службы индексирования Windows Search (Очистка I/O лагов)...
     sc config SearchIndexer start= disabled >nul 2>&1
     net stop SearchIndexer >nul 2>&1
-    :: Отключаем штампы времени NTFS для ускорения дисков QEMU
     reg add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v NtfsDisable8dot3NameCreation /t REG_DWORD /d 1 /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v NtfsDisableLastAccessUpdate /t REG_DWORD /d 1 /f >nul 2>&1
     if !errorlevel! equ 0 (echo    - Полное глушение Windows Search I/O: [УСПЕШНО]) else (echo    - Полное глушение Windows Search I/O: [СБОЙ])
